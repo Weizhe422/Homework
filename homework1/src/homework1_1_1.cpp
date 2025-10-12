@@ -1,3 +1,4 @@
+//Ackermann Function(遞迴)
 #include <iostream>
 using namespace std;
 int ack(int m, int n) {
