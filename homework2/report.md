@@ -1,4 +1,5 @@
 41343134
+
 作業一 Ackermann Function
 解題說明
 用遞迴函式和非遞迴函式，計算 Ackermann 函數 
