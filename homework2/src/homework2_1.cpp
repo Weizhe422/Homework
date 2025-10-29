@@ -1,4 +1,4 @@
-#include <iostream>
+ #include <iostream>
 #include <algorithm> // for std::copy
 #include <cmath>     // for pow()
 using namespace std;
@@ -7,15 +7,15 @@ class Polynomial;
 
 class Term {
     friend Polynomial;
-    friend ostream& operator<<(ostream &output, const Polynomial &Poly);
+    friend ostream& operator<<(ostream& output, const Polynomial& Poly);
 private:
     int exp;   // 指數
     float coef; // 係數
 };
 
-class Polynomial { 
+class Polynomial {
 private:
-    Term *termArray;  // 儲存多項式各項
+    Term* termArray;  // 儲存多項式各項
     int capacity;     // 陣列容量
     int terms;        // 實際項數
 public:
@@ -29,8 +29,8 @@ public:
     float Eval(float x);            // 代入 x 求值
     void newTerm(const float newcoef, const int newexp); // 新增項目
 
-    friend istream& operator>>(istream &input, Polynomial &Poly);
-    friend ostream& operator<<(ostream &output, const Polynomial &Poly);
+    friend istream& operator>>(istream& input, Polynomial& Poly);
+    friend ostream& operator<<(ostream& output, const Polynomial& Poly);
 };
 
 //------------------- operator >> -------------------
@@ -128,7 +128,7 @@ void Polynomial::newTerm(const float theCoef, const int theExp) {
     if (theCoef == 0) return;
     if (terms == capacity) {
         capacity *= 2;
-        Term *temp = new Term[capacity];
+        Term* temp = new Term[capacity];
         copy(termArray, termArray + terms, temp);
         delete[] termArray;
         termArray = temp;
@@ -159,6 +159,7 @@ int main() {
     cout << "\nEnter x to evaluate Polynomial 1: ";
     cin >> x;
     cout << "P1(" << x << ") = " << p1.Eval(x) << endl;
+	system("pause");
 
     return 0;
 }
