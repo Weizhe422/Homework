@@ -1,4 +1,4 @@
- #include <iostream>
+#include <iostream>
 #include <algorithm> // for std::copy
 #include <cmath>     // for pow()
 using namespace std;
