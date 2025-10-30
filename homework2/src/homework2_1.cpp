@@ -137,16 +137,16 @@ void Polynomial::newTerm(const float theCoef, const int theExp) {
     termArray[terms++].exp = theExp;
 }
 
-//------------------- main -------------------
+
 int main() {
     Polynomial p1, p2, sum, prod;
     float x;
 
-    cout << "=== Input Polynomial 1 ===\n";
+    
     cin >> p1;
     cout << "Polynomial 1: " << p1 << endl;
 
-    cout << "\n=== Input Polynomial 2 ===\n";
+    
     cin >> p2;
     cout << "Polynomial 2: " << p2 << endl;
 
