@@ -16,6 +16,7 @@
 Microsoft Visual Studio Code C/C++
 
 ```Chain.h
+//Chain.h
 #ifndef CHAIN_H
 #define CHAIN_H
 
@@ -189,6 +190,7 @@ public:
 
 ```
 ```Polynomial.h
+//Polynomial.h
 #ifndef POLYNOMIAL_H
 #define POLYNOMIAL_H
 
@@ -344,6 +346,7 @@ inline ostream& operator<<(ostream& os, const Polynomial& poly) {
 #endif
 ```
 ```main.cpp
+//main.cpp
 #include <iostream>
 #include "Polynomial.h"
 
