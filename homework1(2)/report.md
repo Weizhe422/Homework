@@ -291,7 +291,7 @@ n        H     H/log2n
 9000     31    2.35998
 10000    29    2.18247
 ```
-![BST ratio plot](src/1.png)
+![BST ratio plot](ratio.jpg)
 ### 結論
 本實驗透過對不同規模𝑛的資料進行隨機插入，對每個不同的 (n) 建立一棵 Binary Search Tree（BST）
 ，並計算其高度，進一步與 
