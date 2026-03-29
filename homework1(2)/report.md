@@ -4,17 +4,24 @@
     使用最小堆（Min-Heap）來實作最小優先佇列（Min Priority Queue, MinPQ）
 
 ### 解題策略
-1. n 個整數後全部插入堆中，再重複取出 Top() 並 Pop() 
+1. n 個整數後全部插入堆中，再重複取出 Top() 並 Pop()
+2. 
    定義 MinPQ<T> 虛擬函式
+   
    Push(x)：插入元素
+   
    Top()：取得目前最小元素（不刪除）
+   
    Pop()：刪除目前最小元素
 
-2. 陣列表示完全二元樹
+4. 陣列表示完全二元樹
    使用陣列 heap 來存 heap：
    根節點：heap[1]
+   
    parent = i/2
+
    left child = 2*i
+   
    right clild = 2*i+1
    
 ## 程式實作
@@ -22,15 +29,16 @@
 Microsoft Visual Studio Code C/C++
 
 
-```
+```cpp
 #include <iostream>
 #include <stdexcept>
+#include <utility>
 using namespace std;
 
 template <class T>
 class MinPQ {
 public:
-    virtual ~MinPQ() {}
+    virtual ~MinPQ() = default;
     virtual bool IsEmpty() const = 0;
     virtual const T& Top() const = 0;
     virtual void Push(const T& x) = 0;
@@ -40,11 +48,12 @@ public:
 template <class T>
 class MinHeap : public MinPQ<T> {
 private:
-    T* heap;        // 1-based
+    T* heap;        
     int capacity;
     int size;
 
     void Resize(int newCapacity) {
+        if (newCapacity < 1) newCapacity = 1;
         T* newHeap = new T[newCapacity + 1];
         for (int i = 1; i <= size; i++) newHeap[i] = heap[i];
         delete[] heap;
@@ -77,9 +86,10 @@ private:
     }
 
 public:
-    MinHeap(int initCapacity = 10) : capacity(initCapacity), size(0) {
+    explicit MinHeap(int initCapacity = 10)
+        : heap(nullptr), capacity(initCapacity), size(0) {
         if (capacity < 1) capacity = 1;
-        heap = new T[capacity + 1];
+        heap = new T[capacity + 1]; 
     }
 
     ~MinHeap() override {
@@ -104,6 +114,15 @@ public:
         heap[1] = heap[size--];
         if (!IsEmpty()) SiftDown(1);
     }
+
+  
+    void PrintArrayOrder() const {
+        for (int i = 1; i <= size; i++) {
+            if (i != 1) cout << ' ';
+            cout << heap[i];
+        }
+        cout << '\n';
+    }
 };
 
 int main() {
@@ -111,31 +130,20 @@ int main() {
     cin.tie(nullptr);
 
     int n;
-    cin >> n;
+    if (!(cin >> n)) return 0;
 
-    MinHeap<int> pq(n); // 初始容量設 n，通常就不會 resize
+    MinHeap<int> pq(n > 0 ? n : 1);
+
     for (int i = 0; i < n; i++) {
         int x;
         cin >> x;
         pq.Push(x);
     }
 
-    // 輸出排序結果
-    for (int i = 0; i < n; i++) {
-        cout << pq.Top();
-        pq.Pop();
-        if (i != n - 1) cout << " ";
-    }
-    cout << "\n";
+   
+    pq.PrintArrayOrder();
     return 0;
 }
-
-
-    return 0;
-}
-
-
-
 ```
 ## 效能分析
 ### 時間複雜度：
@@ -146,24 +154,29 @@ int main() {
 ### 空間複雜度：
     heap 空間複雜度：O(n)
     
-## 測試與驗證
 ## 測試案例
 
 
-### 測試一：基本多項式運算
+| 測試案例 | 輸入參數   | 預期輸出 | 實際輸出 |
+|----------|--------------|----------|----------|
+| 測試一   |6<br> 6 4 1 3 2 5   | 1 2 4 6 3 5   |  1 2 4 6 3 5       |
+| 測試二   |7<br> 5 1 2 8 3 5 6   | 1 3 2 8 5 5 6     |  1 3 2 8 5 5 6       |
 
-
-**運算結果：**
 
 
 
 ### 測試輸入
 ```
-
+6
+6 4 1 3 2 5
+7
+5 1 2 8 3 5 6 
 ```
 ### 測試輸出
 ```
+1 2 4 6 3 5
 
+1 3 2 8 5 5 6
 ```
 
 
