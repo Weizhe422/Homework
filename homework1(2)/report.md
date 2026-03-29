@@ -1,10 +1,22 @@
 # 41343134
-## 作業三 Polynomial + Available Lists
+## 作業三 Max/Min Heap
 ## 解題說明
-
+    使用最小堆（Min-Heap）來實作最小優先佇列（Min Priority Queue, MinPQ）
 
 ### 解題策略
+1. n 個整數後全部插入堆中，再重複取出 Top() 並 Pop() 
+   定義 MinPQ<T> 虛擬函式
+   Push(x)：插入元素
+   Top()：取得目前最小元素（不刪除）
+   Pop()：刪除目前最小元素
 
+2. 陣列表示完全二元樹
+   使用陣列 heap 來存 heap：
+   根節點：heap[1]
+   parent = i/2
+   left child = 2*i
+   right clild = 2*i+1
+   
 ## 程式實作
 ### IDE:
 Microsoft Visual Studio Code C/C++
@@ -127,10 +139,16 @@ int main() {
 ```
 ## 效能分析
 ### 時間複雜度：
-
-
+    Top()：O(1)
+    Push(x)：O(log n)
+    Pop()：O(log n)
+    總時間複雜度：O(n log n)
+### 空間複雜度：
+    heap 空間複雜度：O(n)
+    
 ## 測試與驗證
 ## 測試案例
+
 
 ### 測試一：基本多項式運算
 
@@ -154,7 +172,6 @@ int main() {
 #### 資料結構設計
 
 
-2.ChainNode 節點
 
 ​
 
@@ -163,12 +180,6 @@ int main() {
 ​
 
 - 核心功能：
-
-    - getNode()：取得可用節點
-
-    - getBack(node)：一次回收大量節點
-
-    - getOneNodeOrNew(elem)：取得節點或創建新節點
 
 
 
