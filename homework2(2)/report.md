@@ -374,6 +374,17 @@ int main() {
 
 ```
 ### 結論
-
+本作業完成圖形結構的 adjacency list 表示，並實作 DFS、BFS、Connected Components、Prim、Kruskal 與 Dijkstra，驗證各演算法在無權與加權圖上的應用，達成理解圖資料結構與演算法的目的。
 
 ## 申論及開發報告
+(1) 為何選 adjacency list
+ -相較 adjacency matrix，adjacency list 的空間需求為 O(V+E)，對於多數稀疏圖更省記憶體，且 DFS/BFS/Dijkstra 都需要遍歷鄰邊，使用 adjacency list 較有效率。
+
+(2) 為何 Kruskal 要用 Disjoint Set（Union-Find）
+ -Kruskal 需要快速判斷加入某條邊是否會形成 cycle。DSU 能以極低成本維護集合合併與查詢，大幅提升整體效率，使主要時間成本集中在邊排序 O(E log E)。
+
+(3) Dijkstra 的限制與適用範圍
+ -Dijkstra 必須在權重非負時才能保證「每次取出的最小距離節點」為最終最短路。若存在負權邊，需改用 Bellman-Ford 等演算法。
+
+(4) 模組化設計的優點
+ -將無權圖與加權圖拆開實作，可讓程式更易閱讀與維護；抽象基底 Graph 統一介面，使得不同圖類別的使用方式一致，符合物件導向封裝概念。
