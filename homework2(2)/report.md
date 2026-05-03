@@ -325,7 +325,34 @@ int main() {
 ```
 
 ## 效能分析
+- V = 頂點數
+- E = 邊數（無向圖）
+- 
+(1) Adjacency List
+- 空間：O(V + E)
+- 顯示 display：O(V + E)
 
+(2) DFS / BFS
+- 時間：O(V + E)
+- 空間：O(V)（visited；BFS queue 或 DFS recursion stack）
+
+(3) Connected Components
+- 時間：O(V + E)（每個點、每條邊最多走訪一次）
+- 空間：O(V)
+
+(4) Prim（priority queue）
+- 時間：O(E log V)
+- 空間：O(V + E)
+
+(5) Kruskal（排序 + DSU）
+- 排序：O(E log E)
+- DSU：近似 O(E α(V))（α 幾乎視為常數）
+- 總時間：O(E log E)
+- 空間：O(V + E)
+
+(6) Dijkstra（priority queue）
+- 時間：O((V + E) log V)
+- 空間：O(V + E)
 ## 測試與驗證
 
 ### 測試案例 
