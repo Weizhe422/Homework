@@ -50,7 +50,7 @@ public:
 	virtual void insertEdge(int u, int v) = 0;
 	virtual void display() = 0;
 };
-}
+
 
 ```
 
