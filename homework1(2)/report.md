@@ -1,34 +1,33 @@
-# 41343134
-## 作業三 Max/Min Heap
+# 41343134曾偉哲 41343143詹竣翔
+## 作業二 Graph
 ## 解題說明
-    使用最小堆（Min-Heap）來實作最小優先佇列（Min Priority Queue, MinPQ）
-    
-   - 虛擬析構函數
-   - IsEmpty()：檢查佇列是否為空
-   - Top()：回傳引用的最大元素
-   - Push(const T&)：加入一個元素
-   - Pop()：移除最大優先級的元素
+ 本作業目標為透過程式實作與操作，理解圖（Graph）在資料結構中的表示方式與常用演算法   
+- 圖的表示方式(ADT):
+
+  Adjacency List（鄰接串列）、Adjacency Matrix（鄰接矩陣）
+ 
+- 圖的走訪（DFS、BFS）
+
+  DFS（Depth First Search）：深度優先搜尋，使用遞迴或 stack。
+
+  BFS（Breadth First Search）：廣度優先搜尋，使用 queue。
+
+- 連通元件（Connected Components）
+
+  對每個未被訪問的頂點進行 DFS，DFS 被啟動的次數即為連通元件數量。
+
+- 最小生成樹（Minimum Spanning Tree）
+ 
+  Kruskal 演算法：將邊依權重排序，利用 DSU（Union-Find）避免形成 cycle。
+
+- 最短路徑（Shortest Path）
+
+  Dijkstra 演算法：用 priority queue 每次取出目前距離最小的點進行鬆弛（relax），適用於非負權重圖。
+
 
 ### 解題策略
-1. n 個整數後全部插入堆中，再重複取出 Top() 並 Pop
-
-2. 定義 MinPQ<T> 虛擬函式
-   - Push(x)：插入元素
-
-   - Top()：取得目前最小元素（不刪除）
-   
-   - Pop()：刪除目前最小元素
 
 
-4. 陣列表示完全二元樹
-   使用陣列 heap 來存 heap：
-   根節點：heap[1]
-   
-   parent = i/2
-
-   left child = 2*i
-   
-   right clild = 2*i+1
    
 ## 程式實作
 ### IDE:
@@ -37,118 +36,316 @@ Microsoft Visual Studio Code C/C++
 
 ```cpp
 #include <iostream>
-#include <stdexcept>
-#include <utility>
+#include <vector>
+#include <queue>
+#include <algorithm>
+#include <list>
+#include <climits>
+
 using namespace std;
 
-template <class T>
-class MinPQ {
+// Disjoint Set (Union-Find) 用於 Kruskal's Algorithm
+class DisjointSet {
+	vector<int> parent, rank;
 public:
-    virtual ~MinPQ() = default;
-    virtual bool IsEmpty() const = 0;
-    virtual const T& Top() const = 0;
-    virtual void Push(const T& x) = 0;
-    virtual void Pop() = 0;
+	DisjointSet(int n) {
+		parent.resize(n);
+		rank.resize(n, 0);
+		for(int i = 0; i < n; ++i) parent[i] = i;
+	}
+	int find(int i) {
+		if(parent[i] == i) return i;
+		return parent[i] = find(parent[i]); // 路徑壓縮
+	}
+	void unionSets(int i, int j) {
+		int root_i = find(i);
+		int root_j = find(j);
+		if(root_i != root_j) {
+			// 按秩合併 (Union by Rank)
+			if(rank[root_i] < rank[root_j]) {
+				parent[root_i] = root_j;
+			} else if(rank[root_i] > rank[root_j]) {
+				parent[root_j] = root_i;
+			} else {
+				parent[root_j] = root_i;
+				rank[root_i]++;
+			}
+		}
+	}
 };
 
-template <class T>
-class MinHeap : public MinPQ<T> {
-private:
-    T* heap;        
-    int capacity;
-    int size;
+// 圖的抽象資料型態 (Graph ADT)
+class Graph {
+protected:
+	int numVertices;
+public:
+	Graph(int v) : numVertices(v) {}
+	virtual ~Graph() = default;
 
-    void Resize(int newCapacity) {
-        if (newCapacity < 1) newCapacity = 1;
-        T* newHeap = new T[newCapacity + 1];
-        for (int i = 1; i <= size; i++) newHeap[i] = heap[i];
-        delete[] heap;
-        heap = newHeap;
-        capacity = newCapacity;
-    }
+	// 定義基本操作介面
+	virtual void insertEdge(int u, int v) = 0;
+	virtual void display() = 0;
+};
 
-    void SiftUp(int i) {
-        while (i > 1) {
-            int p = i / 2;
-            if (!(heap[i] < heap[p])) break;
-            swap(heap[i], heap[p]);
-            i = p;
-        }
-    }
+// 無權重圖 (LinkedGraph) - 使用鄰接串列 (Adjacency List)
+class LinkedGraph : public Graph {
+	vector<vector<int>> adjList;
 
-    void SiftDown(int i) {
-        while (true) {
-            int left = 2 * i;
-            int right = left + 1;
-            int smallest = i;
-
-            if (left <= size && heap[left] < heap[smallest]) smallest = left;
-            if (right <= size && heap[right] < heap[smallest]) smallest = right;
-
-            if (smallest == i) break;
-            swap(heap[i], heap[smallest]);
-            i = smallest;
-        }
-    }
+	void dfsUtil(int v, vector<bool>& visited) {
+		visited[v] = true;
+		cout << v << " ";
+		for(int neighbor : adjList[v]) {
+			if(!visited[neighbor]) {
+				dfsUtil(neighbor, visited);
+			}
+		}
+	}
 
 public:
-    explicit MinHeap(int initCapacity = 10)
-        : heap(nullptr), capacity(initCapacity), size(0) {
-        if (capacity < 1) capacity = 1;
-        heap = new T[capacity + 1]; 
-    }
+	LinkedGraph(int v) : Graph(v) {
+		adjList.resize(v);
+	}
 
-    ~MinHeap() override {
-        delete[] heap;
-    }
+	void insertEdge(int u, int v) override {
+		adjList[u].push_back(v);
+		adjList[v].push_back(u); // 無向圖
+	}
 
-    bool IsEmpty() const override { return size == 0; }
+	void display() override {
+		for(int i = 0; i < numVertices; ++i) {
+			cout << i << ": ";
+			for(int neighbor : adjList[i]) {
+				cout << neighbor << " ";
+			}
+			cout << endl;
+		}
+	}
 
-    const T& Top() const override {
-        if (IsEmpty()) throw runtime_error("Top() on empty heap");
-        return heap[1];
-    }
+	void DFS(int startVertex) {
+		vector<bool> visited(numVertices, false);
+		cout << "DFS: ";
+		dfsUtil(startVertex, visited);
+		cout << endl;
+	}
 
-    void Push(const T& x) override {
-        if (size == capacity) Resize(capacity * 2);
-        heap[++size] = x;
-        SiftUp(size);
-    }
+	void BFS(int startVertex) {
+		vector<bool> visited(numVertices, false);
+		queue<int> q;
 
-    void Pop() override {
-        if (IsEmpty()) throw runtime_error("Pop() on empty heap");
-        heap[1] = heap[size--];
-        if (!IsEmpty()) SiftDown(1);
-    }
+		visited[startVertex] = true;
+		q.push(startVertex);
 
-  
-    void PrintArrayOrder() const {
-        for (int i = 1; i <= size; i++) {
-            if (i != 1) cout << ' ';
-            cout << heap[i];
-        }
-        cout << '\n';
-    }
+		cout << "BFS: ";
+		while(!q.empty()) {
+			int v = q.front();
+			q.pop();
+			cout << v << " ";
+
+			for(int neighbor : adjList[v]) {
+				if(!visited[neighbor]) {
+					visited[neighbor] = true;
+					q.push(neighbor);
+				}
+			}
+		}
+		cout << endl;
+	}
+
+	void ConnectedComponents() {
+		vector<bool> visited(numVertices, false);
+		int count = 0;
+		for(int i = 0; i < numVertices; ++i) {
+			if(!visited[i]) {
+				cout << "Component " << ++count << ": ";
+				dfsUtil(i, visited);
+				cout << endl; // 換行，每個連通元件一行
+			}
+		}
+	}
+};
+
+// 加權無向圖 (WeightedGraph)
+class WeightedGraph : public Graph {
+	// 儲存 (neighbor, weight)
+	vector<vector<pair<int, int>>> adjList;
+
+	struct Edge {
+		int u, v, weight;
+	};
+
+	vector<Edge> edges; // 用於 Kruskal's 演算法排序邊
+
+public:
+	WeightedGraph(int v) : Graph(v) {
+		adjList.resize(v);
+	}
+
+	void insertEdge(int u, int v, int weight) {
+		adjList[u].push_back({v, weight});
+		adjList[v].push_back({u, weight});
+		edges.push_back({u, v, weight});
+	}
+
+	// 實作抽象類別方法
+	void insertEdge(int u, int v) override {
+		insertEdge(u, v, 1);
+	}
+
+	void display() override {
+		for(int i = 0; i < numVertices; ++i) {
+			cout << i << ": ";
+			for(auto& edge : adjList[i]) {
+				cout << "(" << edge.first << ", w:" << edge.second << ") ";
+			}
+			cout << endl;
+		}
+	}
+
+	// Prim's 最小生成樹 (MST)
+	void Prim(int startVertex) {
+		// min-priority queue 儲存 (weight, vertex)
+		priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>> pq;
+		vector<int> key(numVertices, INT_MAX);
+		vector<int> parent(numVertices, -1);
+		vector<bool> inMST(numVertices, false);
+
+		pq.push({0, startVertex});
+		key[startVertex] = 0;
+
+		while(!pq.empty()) {
+			int u = pq.top().second;
+			int weight_u = pq.top().first; // 取得當前的路徑長
+			pq.pop();
+
+			if(inMST[u]) continue;
+			// 由於只對未加入 MST 的頂點更新
+			inMST[u] = true;
+
+			for(auto& edge : adjList[u]) {
+				int v = edge.first;
+				int weight = edge.second;
+
+				if(!inMST[v] && key[v] > weight) {
+					key[v] = weight;
+					pq.push({key[v], v});
+					parent[v] = u;
+				}
+			}
+		}
+
+		cout << "Prim's MST:\n";
+		long long totalWeight = 0;
+		for(int i = 0; i < numVertices; ++i) {
+			if(parent[i] != -1) {
+				cout << parent[i] << " - " << i << " : " << key[i] << "\n";
+				totalWeight += key[i];
+			}
+		}
+		cout << "Total Weight: " << totalWeight << endl;
+	}
+
+	// Kruskal's 最小生成樹 (MST)
+	void Kruskal() {
+		vector<Edge> sortedEdges = edges;
+		sort(sortedEdges.begin(), sortedEdges.end(), [](const Edge& a, const Edge& b){
+			return a.weight < b.weight;
+		});
+
+		DisjointSet ds(numVertices);
+		vector<Edge> mst;
+		long long mstWeight = 0;
+
+		for(auto& edge : sortedEdges) {
+			if(ds.find(edge.u) != ds.find(edge.v)) {
+				ds.unionSets(edge.u, edge.v);
+				mst.push_back(edge);
+				mstWeight += edge.weight;
+			}
+		}
+
+		cout << "Kruskal's MST:\n";
+		for(auto& edge : mst) {
+			cout << edge.u << " - " << edge.v << " : " << edge.weight << "\n";
+		}
+		cout << "Total Weight: " << mstWeight << endl;
+	}
+
+	// Dijkstra's 單源最短路徑
+	void Dijkstra(int src) {
+		priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>> pq;
+		vector<int> dist(numVertices, INT_MAX);
+
+		pq.push({0, src});
+		dist[src] = 0;
+
+		while(!pq.empty()) {
+			int u = pq.top().second;
+			int d = pq.top().first;
+			pq.pop();
+
+			// 如果取出的距離大於已記錄的最小距離，則忽略
+			if (d > dist[u]) continue;
+
+			for(auto& edge : adjList[u]) {
+				int v = edge.first;
+				int weight = edge.second;
+
+				if(dist[v] > dist[u] + weight) {
+					dist[v] = dist[u] + weight;
+					pq.push({dist[v], v});
+				}
+			}
+		}
+
+		cout << "Dijkstra's Shortest Paths from " << src << ":\n";
+		for(int i = 0; i < numVertices; ++i) {
+			cout << "To " << i << " : ";
+			if (dist[i] == INT_MAX) cout << "Infinity\n";
+			else cout << dist[i] << "\n";
+		}
+	}
 };
 
 int main() {
-    ios::sync_with_stdio(false);
-    cin.tie(nullptr);
+	cout << "=== LinkedGraph (無權重圖) ===\n";
+	LinkedGraph lg(5);
+	lg.insertEdge(0, 1);
+	lg.insertEdge(0, 2);
+	lg.insertEdge(1, 3);
+	//lg.insertEdge(2, 4);
+	lg.insertEdge(3, 4);
+	// 故意將頂點 5 設為孤立點以測試連通元件
 
-    int n;
-    if (!(cin >> n)) return 0;
+	lg.display();
+	lg.DFS(0);
+	lg.BFS(0);
+	lg.ConnectedComponents();
 
-    MinHeap<int> pq(n > 0 ? n : 1);
+	cout << "\n=== WeightedGraph (加權無向圖) ===\n";
+	WeightedGraph wg(4);
+	wg.insertEdge(0, 1, 10);
+	wg.insertEdge(0, 2, 6);
+	wg.insertEdge(0, 3, 5);
+	wg.insertEdge(1, 3, 15);
+	wg.insertEdge(2, 3, 4);
+	/*wg.insertEdge(0, 1, 2);
+	wg.insertEdge(0, 3, 6);
+	wg.insertEdge(1, 2, 3);
+	wg.insertEdge(1, 3, 8);
+	wg.insertEdge(1, 4, 5);
+	wg.insertEdge(2, 4, 7);
+	wg.insertEdge(3, 4, 9);*/
 
-    for (int i = 0; i < n; i++) {
-        int x;
-        cin >> x;
-        pq.Push(x);
-    }
 
-   
-    pq.PrintArrayOrder();
-    return 0;
+	wg.display();
+	cout << endl;
+	wg.Prim(0);
+	cout << endl;
+	wg.Kruskal();
+	cout << endl;
+	wg.Dijkstra(0);
+
+	return 0;
 }
 ```
 ## 效能分析
