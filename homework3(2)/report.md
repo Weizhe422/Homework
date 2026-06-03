@@ -1,33 +1,38 @@
 # 41343134
- 
-## 作業一 Max/Min Heap
+# 41343143
+## 作業三 Sorting Project
 
 ## 解題說明
-將課堂所學的MaxHeap實作MinHeap並以MinPQ的架構去編寫
- 
-### 解題策略
-目標:將 n 個整數插入 Min-Heap，最後以二元樹的陣列表示輸出
-1. 先定義 ADT：MinPQ<T>（抽象類別）
-   
-   - IsEmpty()：判斷是否為空
-   - Top()：回傳目前最小值
-   - Push(x)：插入元素
-   - Pop()：刪除原本最小值
-  
-2. 實作 MinPQ<T>：class MinHeap : public MinPQ<T>
-資料結構選擇：
+本專案的核心在於實作五種不同的排序方法，去改變資料的「性質」和「大小」，來觀察演算法。實作的五種排序演算法有 :
+
+1. Insertion Sort : 是一種簡單直觀的排序演算法。它的運作方式如同整理手中的撲克牌
+2. Quick Sort（Median-of-Three）: 是一種高效率的排序演算法，採用分治法（Divide and Conquer）策略  
+3. Iterative Merge Sort  : 
+4. Heap Sort  
+5. Composite Sort  
+
+--- 
+
+## 解題策略
+
+### 1. Insertion Sort（插入排序）排序方式 : 
+
+它將資料分為「已排序」與「未排序」兩部分，每次從未排序中取出一個元素，
+
+在已排序區中由後向前比對，找到適當位置插入，直到所有元素排序完成。
+
+### 2. Quick Sort (快速排序)  排序方式:
+
+透過挑選一個基準值（Pivot），將陣列分為左右兩部分，使左側元素皆小於基準值
+
+，右側元素皆大於基準值，再遞迴處理兩側子陣列來完成排序。
+
+### 3.
 
 
-   - 用陣列 heap 存完全二元樹
 
-   - 採 1-based indexing：根節點在 heap[1]
+---
 
-      - parent = i/2
-      - left child = 2*i
-      - right child = 2*i + 1
-
-
-   
 ## 程式實作
 ### IDE:
 Microsoft Visual Studio Code C/C++
