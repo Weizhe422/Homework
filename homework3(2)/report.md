@@ -40,152 +40,350 @@ Microsoft Visual Studio Code C/C++
 
 ```cpp
 #include <iostream>
-#include <stdexcept>
-#include <utility>
+#include <vector>
+#include <algorithm>
+#include <chrono>
+#include <cstdlib>
+#include <ctime>
+#include <iomanip>
 using namespace std;
-
 template <class T>
-class MinPQ {
-public:
-    virtual ~MinPQ() = default;
-    virtual bool IsEmpty() const = 0;
-    virtual const T& Top() const = 0;
-    virtual void Push(const T& x) = 0;
-    virtual void Pop() = 0;
-};
-
-template <class T>
-class MinHeap : public MinPQ<T> {
-private:
-    T* heap;        
-    int capacity;
-    int size;
-
-    void Resize(int newCapacity) {
-        if (newCapacity < 1) newCapacity = 1;
-        T* newHeap = new T[newCapacity + 1];
-        for (int i = 1; i <= size; i++) newHeap[i] = heap[i];
-        delete[] heap;
-        heap = newHeap;
-        capacity = newCapacity;
+void Permute(T* a, int n) {
+    for (int i = n - 1; i >= 1; i--) {
+        int j = rand() % (i + 1);
+        swap(a[i], a[j]);
     }
-
-    void SiftUp(int i) {
-        while (i > 1) {
-            int p = i / 2;
-            if (!(heap[i] < heap[p])) break;
-            swap(heap[i], heap[p]);
-            i = p;
+}
+void InsertionSort(int* a, int n) {
+    for (int i = 1; i < n; i++) {
+        int key = a[i];
+        int j = i - 1;
+        while (j >= 0 && a[j] > key) {
+            a[j + 1] = a[j];
+            j--;
         }
+        a[j + 1] = key;
     }
-
-    void SiftDown(int i) {
+}
+int MedianOfThree(int* a, int low, int high) {
+    int mid = low + (high - low) / 2;
+    if (a[low] > a[mid]) swap(a[low], a[mid]);
+    if (a[low] > a[high]) swap(a[low], a[high]);
+    if (a[mid] > a[high]) swap(a[mid], a[high]);
+    swap(a[mid], a[high - 1]);
+    return a[high - 1];
+}
+void QuickSortHelper(int* a, int low, int high) {
+    if (low + 10 <= high) {
+        int pivot = MedianOfThree(a, low, high);
+        int i = low;
+        int j = high - 1;
         while (true) {
-            int left = 2 * i;
-            int right = left + 1;
-            int smallest = i;
+            while (a[++i] < pivot);
+            while (a[--j] > pivot);
+            if (i < j) swap(a[i], a[j]);
+            else break;
+        }
+        swap(a[i], a[high - 1]);
+        QuickSortHelper(a, low, i - 1);
+        QuickSortHelper(a, i + 1, high);
+    }
+    else {
+        InsertionSort(a + low, high - low + 1);
+    }
+}
 
-            if (left <= size && heap[left] < heap[smallest]) smallest = left;
-            if (right <= size && heap[right] < heap[smallest]) smallest = right;
+void QuickSort(int* a, int n) {
+    QuickSortHelper(a, 0, n - 1);
+}
+void Merge(int* a, int* temp, int l, int m, int r) {
+    int i = l, j = m + 1, k = l;
+    while (i <= m && j <= r) {
+        if (a[i] <= a[j]) temp[k++] = a[i++];
+        else temp[k++] = a[j++];
+    }
+    while (i <= m) temp[k++] = a[i++];
+    while (j <= r) temp[k++] = a[j++];
+    for (i = l; i <= r; i++) a[i] = temp[i];
+}
 
-            if (smallest == i) break;
-            swap(heap[i], heap[smallest]);
-            i = smallest;
+void MergeSort(int* a, int n) {
+    int* temp = new int[n];
+    for (int curr_size = 1; curr_size <= n - 1; curr_size = 2 * curr_size) {
+        for (int left_start = 0; left_start < n - 1; left_start += 2 * curr_size) {
+            int mid = min(left_start + curr_size - 1, n - 1);
+            int right_end = min(left_start + 2 * curr_size - 1, n - 1);
+            Merge(a, temp, left_start, mid, right_end);
+        }
+    }
+    delete[] temp;
+}
+void MaxHeapify(int* a, int i, int n) {
+    int child;
+    int temp = a[i];
+    for (; 2 * i + 1 < n; i = child) {
+        child = 2 * i + 1;
+        if (child != n - 1 && a[child + 1] > a[child]) {
+            child++;
+        }
+        if (temp < a[child]) {
+            a[i] = a[child];
+        }
+        else {
+            break;
+        }
+    }
+    a[i] = temp;
+}
+void HeapSort(int* a, int n) {
+    for (int i = n / 2 - 1; i >= 0; i--) {
+        MaxHeapify(a, i, n);
+    }
+    for (int i = n - 1; i > 0; i--) {
+        swap(a[0], a[i]);
+        MaxHeapify(a, 0, i);
+    }
+}
+void CompositeSort(int* a, int n) {
+    if (n <= 32) {
+        InsertionSort(a, n);
+    }
+    else {
+        MergeSort(a, n);
+    }
+}
+void GenerateInsertionWorst(int* a, int n) {
+    for (int i = 0; i < n; i++) a[i] = n - i;
+}
+void MergeWorstHelper(int* a, int* temp, int l, int r) {
+    if (l >= r) return;
+    if (l + 1 == r) {
+        swap(a[l], a[r]);
+        return;
+    }
+    int m = l + (r - l) / 2;
+    int i, k = 0;
+    for (i = l; i <= r; i++) temp[k++] = a[i];
+    for (i = l, k = 0; i <= m; i++, k += 2) a[i] = temp[k];
+    for (i = m + 1, k = 1; i <= r; i++, k += 2) a[i] = temp[k];
+
+    MergeWorstHelper(a, temp, l, m);
+    MergeWorstHelper(a, temp, m + 1, r);
+}
+
+void GenerateMergeWorst(int* a, int n) {
+    for (int i = 0; i < n; i++) a[i] = i + 1;
+    int* temp = new int[n];
+    MergeWorstHelper(a, temp, 0, n - 1);
+    delete[] temp;
+}
+bool VerifySort(void (*sort_func)(int*, int), string name) {
+    const int test_size = 50;
+    int* origin = new int[test_size];
+    int* test_arr = new int[test_size];
+
+    for (int i = 0; i < test_size; i++) origin[i] = rand() % 1000;
+    copy(origin, origin + test_size, test_arr);
+
+    sort_func(test_arr, test_size);
+    sort(origin, origin + test_size);
+
+    bool correct = true;
+    for (int i = 0; i < test_size; i++) {
+        if (test_arr[i] != origin[i]) {
+            correct = false;
+            break;
         }
     }
 
-public:
-    explicit MinHeap(int initCapacity = 10)
-        : heap(nullptr), capacity(initCapacity), size(0) {
-        if (capacity < 1) capacity = 1;
-        heap = new T[capacity + 1]; 
+    delete[] origin;
+    delete[] test_arr;
+
+    cout << "  - " << left << setw(15) << name << ": " << (correct ? "[PASS]" : "[FAIL]") << "\n";
+    return correct;
+}
+void RunCorrectnessTest() {
+    cout << "\n==================================================\n";
+    cout << " 1. Correctness Test!!\n";
+    cout << "==================================================\n";
+    bool all_pass = true;
+    all_pass &= VerifySort(InsertionSort, "Insertion Sort");
+    all_pass &= VerifySort(MergeSort, "Merge Sort");
+    all_pass &= VerifySort(HeapSort, "Heap Sort");
+    all_pass &= VerifySort(QuickSort, "Quick Sort");
+    all_pass &= VerifySort(CompositeSort, "Composite Sort");
+    if (!all_pass) {
+        cout << "\n[warn!!!]n";
+        exit(1);
     }
-
-    ~MinHeap() override {
-        delete[] heap;
+    cout << "[pass!!!]\n";
+}
+typedef void (*SortFunc)(int*, int);
+double TimeWorstCase(SortFunc sort_func, int* worst_data, int n, int repetitions) {
+    int* test_array = new int[n];
+    auto start = chrono::high_resolution_clock::now();
+    for (int r = 0; r < repetitions; r++) {
+        copy(worst_data, worst_data + n, test_array);
+        sort_func(test_array, n);
     }
-
-    bool IsEmpty() const override { return size == 0; }
-
-    const T& Top() const override {
-        if (IsEmpty()) throw runtime_error("Top() on empty heap");
-        return heap[1];
+    auto end = chrono::high_resolution_clock::now();
+    delete[] test_array;
+    chrono::duration<double, micro> duration = end - start;
+    return duration.count() / repetitions;
+}
+double TimeAverageCase(SortFunc sort_func, int n, int repetitions) {
+    int* test_array = new int[n];
+    auto start = chrono::high_resolution_clock::now();
+    for (int r = 0; r < repetitions; r++) {
+        for (int i = 0; i < n; i++) test_array[i] = i + 1;
+        Permute(test_array, n);
+        sort_func(test_array, n);
     }
-
-    void Push(const T& x) override {
-        if (size == capacity) Resize(capacity * 2);
-        heap[++size] = x;
-        SiftUp(size);
-    }
-
-    void Pop() override {
-        if (IsEmpty()) throw runtime_error("Pop() on empty heap");
-        heap[1] = heap[size--];
-        if (!IsEmpty()) SiftDown(1);
-    }
-
-  
-    void PrintArrayOrder() const {
-        for (int i = 1; i <= size; i++) {
-            if (i != 1) cout << ' ';
-            cout << heap[i];
-        }
-        cout << '\n';
-    }
-};
-
+    auto end = chrono::high_resolution_clock::now();
+    delete[] test_array;
+    chrono::duration<double, micro> duration = end - start;
+    return duration.count() / repetitions;
+}
 int main() {
-    ios::sync_with_stdio(false);
-    cin.tie(nullptr);
-
-    int n;
-    if (!(cin >> n)) return 0;
-
-    MinHeap<int> pq(n > 0 ? n : 1);
-
-    for (int i = 0; i < n; i++) {
-        int x;
-        cin >> x;
-        pq.Push(x);
+    srand(time(nullptr));
+    RunCorrectnessTest();
+    vector<int> test_sizes = { 500, 1000, 2000, 3000, 4000, 5000 };
+    auto get_reps = [](int n) {
+        if (n <= 1000) return 500;
+        if (n <= 3000) return 100;
+        return 20;
+        };
+    struct DataRow {
+        int n;
+        double ins, mrg, hp, qk, cmp;
+    };
+    vector<DataRow> worst_results;
+    vector<DataRow> avg_results;
+    for (int n : test_sizes) {
+        int reps = get_reps(n);
+        int* data = new int[n];
+        DataRow w_row{ n }, a_row{ n };
+        GenerateInsertionWorst(data, n);
+        w_row.ins = TimeWorstCase(InsertionSort, data, n, reps);
+        GenerateMergeWorst(data, n);
+        w_row.mrg = TimeWorstCase(MergeSort, data, n, reps);
+        w_row.cmp = TimeWorstCase(CompositeSort, data, n, reps);
+        double max_hp = 0, max_qk = 0;
+        for (int p = 0; p < 15; p++) {
+            for (int i = 0; i < n; i++) data[i] = i + 1;
+            Permute(data, n);
+            max_hp = max(max_hp, TimeWorstCase(HeapSort, data, n, reps));
+            max_qk = max(max_qk, TimeWorstCase(QuickSort, data, n, reps));
+        }
+        w_row.hp = max_hp;
+        w_row.qk = max_qk;
+        worst_results.push_back(w_row);
+        a_row.ins = TimeAverageCase(InsertionSort, n, reps);
+        a_row.mrg = TimeAverageCase(MergeSort, n, reps);
+        a_row.hp = TimeAverageCase(HeapSort, n, reps);
+        a_row.qk = TimeAverageCase(QuickSort, n, reps);
+        a_row.cmp = TimeAverageCase(CompositeSort, n, reps);
+        avg_results.push_back(a_row);
+        delete[] data;
+    }
+    cout << fixed << setprecision(2);
+    cout << "\n=========================================================================================\n";
+    cout << " 2. Worst-Case Test Report (us)\n";
+    cout << "=========================================================================================\n";
+    cout << left << setw(8) << "n"
+        << setw(16) << "Insertion"
+        << setw(16) << "Merge"
+        << setw(16) << "Heap(Max)"
+        << setw(16) << "Quick(Max)"
+        << setw(16) << "Composite" << "\n";
+    cout << "-----------------------------------------------------------------------------------------\n";
+    for (const auto& r : worst_results) {
+        cout << left << setw(8) << r.n
+            << setw(16) << r.ins
+            << setw(16) << r.mrg
+            << setw(16) << r.hp
+            << setw(16) << r.qk
+            << setw(16) << r.cmp << "\n";
     }
 
-   
-    pq.PrintArrayOrder();
+    cout << "\n=========================================================================================\n";
+    cout << " 3. Average-Case Test Report　(us)\n";
+    cout << "=========================================================================================\n";
+    cout << left << setw(8) << "n"
+        << setw(16) << "Insertion"
+        << setw(16) << "Merge"
+        << setw(16) << "Heap"
+        << setw(16) << "Quick"
+        << setw(16) << "Composite" << "\n";
+    cout << "-----------------------------------------------------------------------------------------\n";
+    for (const auto& r : avg_results) {
+        cout << left << setw(8) << r.n
+            << setw(16) << r.ins
+            << setw(16) << r.mrg
+            << setw(16) << r.hp
+            << setw(16) << r.qk
+            << setw(16) << r.cmp << "\n";
+    }
+    cout << "=========================================================================================\n";
+
     return 0;
 }
 ```
-## 效能分析
-### 時間複雜度：
-    Top()：O(1)
-    Push(x)：O(log n)
-    Pop()：O(log n)
-    總時間複雜度：O(n log n)
-### 空間複雜度：
-    heap 空間複雜度：O(n)
-    
-## 測試案例
+## 效能分析 
 
+### 時間複雜度： 
+| 排序法 | 最佳 | 平均 | 最壞 |
+|---|---|---|---|
+| Insertion Sort | O(n) | O(n<sup>2</sup>) | O(n<sup>2</sup>) |
+| Quick Sort | O(n log n) | O(n log n) | O(n<sup>2</sup>) |
+| Merge Sort | O(n log n) | O(n log n) | O(n log n) |
+| Heap Sort | O(n log n) | O(n log n) | O(n log n) |
+| Composite Sort | O(n log n) | O(n log n) | O(n log n) |
+### 空間複雜度： 
+| 排序法 | 空間複雜度 |
+|---|---|
+| Insertion Sort | O(1) |
+| Quick Sort | O(log n) |
+| Merge Sort | O(n) |
+| Heap Sort | O(1) |
+| Composite Sort | O(n) |
 
-| 測試案例 | 輸入參數   | 預期輸出 | 實際輸出 |
-|----------|--------------|----------|----------|
-| 測試一   |6<br> 6 4 1 3 2 5   | 1 2 4 6 3 5   |  1 2 4 6 3 5       |
-| 測試二   |7<br> 5 1 2 8 3 5 6   | 1 3 2 8 5 5 6     |  1 3 2 8 5 5 6       |
-
-
-
-
-### 測試輸入
+### 測試結果
 ```
-6
-6 4 1 3 2 5
-7
-5 1 2 8 3 5 6 
-```
-### 測試輸出
-```
-1 2 4 6 3 5
+==================================================
+ 1. 測試各個排序是否正確 Correctness Test!!
+==================================================
+  - Insertion Sort : [PASS]
+  - Merge Sort     : [PASS]
+  - Heap Sort      : [PASS]
+  - Quick Sort     : [PASS]
+  - Composite Sort : [PASS]
+[pass!!!]
 
-1 3 2 8 5 5 6
+=========================================================================================
+ 2. 最壞情況測試 Worst-Case Test Report (us)
+=========================================================================================
+n       Insertion       Merge           Heap(Max)       Quick(Max)      Composite
+-----------------------------------------------------------------------------------------
+500     128.37          15.19           21.57           7.68            19.06
+1000    532.29          34.38           53.56           19.07           34.82
+2000    1904.52         72.69           136.87          79.88           73.08
+3000    4293.31         112.44          229.25          148.26          113.25
+4000    7601.94         158.85          321.12          237.75          155.08
+5000    11974.09        209.94          411.21          308.36          199.19
+
+=========================================================================================
+ 3. 平均情況測試 Average-Case Test Report (us)
+=========================================================================================
+n       Insertion       Merge           Heap            Quick           Composite
+-----------------------------------------------------------------------------------------
+500     78.35           43.39           42.52           42.54           62.05
+1000    290.61          91.53           91.48           73.82           90.98
+2000    1018.62         190.57          191.05          155.93          188.99
+3000    2249.39         297.30          296.95          240.76          294.28
+4000    4062.92         404.99          409.80          331.13          399.34
+5000    6161.88         515.49          547.21          427.71          513.32
+=========================================================================================
 ```
 
 
