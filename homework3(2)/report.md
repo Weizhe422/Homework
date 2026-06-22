@@ -83,7 +83,7 @@ template <class T>
 void Permute(T* a, int n) {
     for (int i = n - 1; i >= 1; i--) {
         int j = rand() % (i + 1);
-        swap(a[i], a[j]);
+        swap(a[i], a[j]); // 將目前的元素與隨機位置的元素對調
     }
 }
 void InsertionSort(int* a, int n) {
