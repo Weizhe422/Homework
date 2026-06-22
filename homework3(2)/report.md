@@ -135,14 +135,17 @@ void Merge(int* a, int* temp, int l, int m, int r) {
         if (a[i] <= a[j]) temp[k++] = a[i++];
         else temp[k++] = a[j++];
     }
-    while (i <= m) temp[k++] = a[i++];
-    while (j <= r) temp[k++] = a[j++];
-    for (i = l; i <= r; i++) a[i] = temp[i];
+    while (i <= m) temp[k++] = a[i++]; // 複製左邊剩餘的資料
+    while (j <= r) temp[k++] = a[j++]; // 複製右邊剩餘的資料
+    for (i = l; i <= r; i++) a[i] = temp[i]; // 把排序好的輔助陣列覆蓋回原陣列
+
 }
 
 void MergeSort(int* a, int n) {
-    int* temp = new int[n];
+    int* temp = new int[n]; // 動態配置一塊與原陣列一樣大的輔助空間
+    // curr_size 代表目前要合併的子陣列長度，以 2 的冪次方不斷翻倍：1, 2, 4, 8
     for (int curr_size = 1; curr_size <= n - 1; curr_size = 2 * curr_size) {
+    // left_start 代表每次合併兩兩分組的起點位置
         for (int left_start = 0; left_start < n - 1; left_start += 2 * curr_size) {
             int mid = min(left_start + curr_size - 1, n - 1);
             int right_end = min(left_start + 2 * curr_size - 1, n - 1);
@@ -153,36 +156,40 @@ void MergeSort(int* a, int n) {
 }
 void MaxHeapify(int* a, int i, int n) {
     int child;
-    int temp = a[i];
+    int temp = a[i]; // 暫存目前準備要「下沉」的根節點
     for (; 2 * i + 1 < n; i = child) {
-        child = 2 * i + 1;
+        child = 2 * i + 1; // 找出左子節點位置
+        // 如果右子節點存在，且右子節點比左子節點大，那就把目標轉向右子節點
         if (child != n - 1 && a[child + 1] > a[child]) {
             child++;
         }
+        // 如果子節點比暫存的根節點大，就把子節點拉上來替代父節點
         if (temp < a[child]) {
             a[i] = a[child];
         }
         else {
-            break;
+            break; // 父節點已經比子節點都大，符合 Max Heap 性質，停止下沉
         }
     }
-    a[i] = temp;
+    a[i] = temp; 將原本的根節點安置在最終點
 }
 void HeapSort(int* a, int n) {
+    // 從最後一個非葉子節點開始，由底向上建立一個完整的 Max Heap
     for (int i = n / 2 - 1; i >= 0; i--) {
         MaxHeapify(a, i, n);
     }
+    // 每次將堆頂最大值交換到陣列最尾端固定，並縮小 Heap 規模重新調整
     for (int i = n - 1; i > 0; i--) {
-        swap(a[0], a[i]);
-        MaxHeapify(a, 0, i);
+        swap(a[0], a[i]); // 把最大值換到陣列後方固定
+        MaxHeapify(a, 0, i); // 對前方剩餘的 i 個元素重新進行堆積下沉調整
     }
 }
 void CompositeSort(int* a, int n) {
     if (n <= 32) {
-        InsertionSort(a, n);
+        InsertionSort(a, n); // 小資料量：直接利用插入排序
     }
     else {
-        MergeSort(a, n);
+        MergeSort(a, n); // 大資料量：使用高穩定度的合併排序拆分
     }
 }
 void GenerateInsertionWorst(int* a, int n) {
