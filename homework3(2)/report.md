@@ -90,6 +90,7 @@ void InsertionSort(int* a, int n) {
     for (int i = 1; i < n; i++) {
         int key = a[i];
         int j = i - 1;
+    // 只要前面的元素比 key 大，就往後挪一格，幫 key 騰出空間
         while (j >= 0 && a[j] > key) {
             a[j + 1] = a[j];
             j--;
@@ -99,10 +100,10 @@ void InsertionSort(int* a, int n) {
 }
 int MedianOfThree(int* a, int low, int high) {
     int mid = low + (high - low) / 2;
-    if (a[low] > a[mid]) swap(a[low], a[mid]);
-    if (a[low] > a[high]) swap(a[low], a[high]);
-    if (a[mid] > a[high]) swap(a[mid], a[high]);
-    swap(a[mid], a[high - 1]);
+    if (a[low] > a[mid]) swap(a[low], a[mid]); //確保 low <= mid
+    if (a[low] > a[high]) swap(a[low], a[high]); // 確保 low <= high
+    if (a[mid] > a[high]) swap(a[mid], a[high]); // 確保 mid <= high
+    swap(a[mid], a[high - 1]); // 把 Pivot 隱藏在 high - 1 的位置
     return a[high - 1];
 }
 void QuickSortHelper(int* a, int low, int high) {
@@ -111,17 +112,17 @@ void QuickSortHelper(int* a, int low, int high) {
         int i = low;
         int j = high - 1;
         while (true) {
-            while (a[++i] < pivot);
-            while (a[--j] > pivot);
+            while (a[++i] < pivot); // 左指標向右找大於等於 pivot 的數
+            while (a[--j] > pivot); // 右指標向左找小於等於 pivot 的數
             if (i < j) swap(a[i], a[j]);
             else break;
         }
-        swap(a[i], a[high - 1]);
-        QuickSortHelper(a, low, i - 1);
-        QuickSortHelper(a, i + 1, high);
+        swap(a[i], a[high - 1]); // 把 Pivot 放回兩邊分割點的交界處
+        QuickSortHelper(a, low, i - 1); // 遞迴處理左半邊
+        QuickSortHelper(a, i + 1, high); // 遞迴處理右半邊
     }
     else {
-        InsertionSort(a + low, high - low + 1);
+        InsertionSort(a + low, high - low + 1); // 元素量太小時，直接改用插入排序
     }
 }
 
