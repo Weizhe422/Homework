@@ -171,7 +171,7 @@ void MaxHeapify(int* a, int i, int n) {
             break; // 父節點已經比子節點都大，符合 Max Heap 性質，停止下沉
         }
     }
-    a[i] = temp; 將原本的根節點安置在最終點
+    a[i] = temp; //將原本的根節點安置在最終點
 }
 void HeapSort(int* a, int n) {
     // 從最後一個非葉子節點開始，由底向上建立一個完整的 Max Heap
