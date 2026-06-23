@@ -236,9 +236,7 @@ bool VerifySort(void (*sort_func)(int*, int), string name) {
     return correct;
 }
 void RunCorrectnessTest() {
-    cout << "\n==================================================\n";
     cout << " 1. Correctness Test!!\n";
-    cout << "==================================================\n";
     bool all_pass = true;
     all_pass &= VerifySort(InsertionSort, "Insertion Sort");
     all_pass &= VerifySort(MergeSort, "Merge Sort");
@@ -320,9 +318,7 @@ int main() {
         delete[] data;
     }
     cout << fixed << setprecision(2);
-    cout << "\n=========================================================================================\n";
     cout << " 2. Worst-Case Test Report (us)\n";
-    cout << "=========================================================================================\n";
     cout << left << setw(8) << "n"
         << setw(16) << "Insertion"
         << setw(16) << "Merge"
@@ -339,9 +335,7 @@ int main() {
             << setw(16) << r.cmp << "\n";
     }
 
-    cout << "\n=========================================================================================\n";
     cout << " 3. Average-Case Test Report　(us)\n";
-    cout << "=========================================================================================\n";
     cout << left << setw(8) << "n"
         << setw(16) << "Insertion"
         << setw(16) << "Merge"
@@ -357,7 +351,6 @@ int main() {
             << setw(16) << r.qk
             << setw(16) << r.cmp << "\n";
     }
-    cout << "=========================================================================================\n";
 
     return 0;
 }
