@@ -83,14 +83,13 @@ template <class T>
 void Permute(T* a, int n) {
     for (int i = n - 1; i >= 1; i--) {
         int j = rand() % (i + 1);
-        swap(a[i], a[j]); // 將目前的元素與隨機位置的元素對調
+        swap(a[i], a[j]);
     }
 }
 void InsertionSort(int* a, int n) {
     for (int i = 1; i < n; i++) {
         int key = a[i];
         int j = i - 1;
-    // 只要前面的元素比 key 大，就往後挪一格，幫 key 騰出空間
         while (j >= 0 && a[j] > key) {
             a[j + 1] = a[j];
             j--;
@@ -100,10 +99,10 @@ void InsertionSort(int* a, int n) {
 }
 int MedianOfThree(int* a, int low, int high) {
     int mid = low + (high - low) / 2;
-    if (a[low] > a[mid]) swap(a[low], a[mid]); //確保 low <= mid
-    if (a[low] > a[high]) swap(a[low], a[high]); // 確保 low <= high
-    if (a[mid] > a[high]) swap(a[mid], a[high]); // 確保 mid <= high
-    swap(a[mid], a[high - 1]); // 把 Pivot 隱藏在 high - 1 的位置
+    if (a[low] > a[mid]) swap(a[low], a[mid]);
+    if (a[low] > a[high]) swap(a[low], a[high]);
+    if (a[mid] > a[high]) swap(a[mid], a[high]);
+    swap(a[mid], a[high - 1]);
     return a[high - 1];
 }
 void QuickSortHelper(int* a, int low, int high) {
@@ -112,17 +111,17 @@ void QuickSortHelper(int* a, int low, int high) {
         int i = low;
         int j = high - 1;
         while (true) {
-            while (a[++i] < pivot); // 左指標向右找大於等於 pivot 的數
-            while (a[--j] > pivot); // 右指標向左找小於等於 pivot 的數
+            while (a[++i] < pivot); 
+            while (a[--j] > pivot); 
             if (i < j) swap(a[i], a[j]);
             else break;
         }
-        swap(a[i], a[high - 1]); // 把 Pivot 放回兩邊分割點的交界處
-        QuickSortHelper(a, low, i - 1); // 遞迴處理左半邊
-        QuickSortHelper(a, i + 1, high); // 遞迴處理右半邊
+        swap(a[i], a[high - 1]); 
+        QuickSortHelper(a, low, i - 1);
+        QuickSortHelper(a, i + 1, high); 
     }
     else {
-        InsertionSort(a + low, high - low + 1); // 元素量太小時，直接改用插入排序
+        InsertionSort(a + low, high - low + 1);
     }
 }
 
@@ -135,17 +134,15 @@ void Merge(int* a, int* temp, int l, int m, int r) {
         if (a[i] <= a[j]) temp[k++] = a[i++];
         else temp[k++] = a[j++];
     }
-    while (i <= m) temp[k++] = a[i++]; // 複製左邊剩餘的資料
-    while (j <= r) temp[k++] = a[j++]; // 複製右邊剩餘的資料
-    for (i = l; i <= r; i++) a[i] = temp[i]; // 把排序好的輔助陣列覆蓋回原陣列
+    while (i <= m) temp[k++] = a[i++];
+    while (j <= r) temp[k++] = a[j++];
+    for (i = l; i <= r; i++) a[i] = temp[i];
 
 }
 
 void MergeSort(int* a, int n) {
-    int* temp = new int[n]; // 動態配置一塊與原陣列一樣大的輔助空間
-    // curr_size 代表目前要合併的子陣列長度，以 2 的冪次方不斷翻倍：1, 2, 4, 8
+    int* temp = new int[n]; 
     for (int curr_size = 1; curr_size <= n - 1; curr_size = 2 * curr_size) {
-    // left_start 代表每次合併兩兩分組的起點位置
         for (int left_start = 0; left_start < n - 1; left_start += 2 * curr_size) {
             int mid = min(left_start + curr_size - 1, n - 1);
             int right_end = min(left_start + 2 * curr_size - 1, n - 1);
@@ -156,40 +153,36 @@ void MergeSort(int* a, int n) {
 }
 void MaxHeapify(int* a, int i, int n) {
     int child;
-    int temp = a[i]; // 暫存目前準備要「下沉」的根節點
+    int temp = a[i];
     for (; 2 * i + 1 < n; i = child) {
-        child = 2 * i + 1; // 找出左子節點位置
-        // 如果右子節點存在，且右子節點比左子節點大，那就把目標轉向右子節點
+        child = 2 * i + 1;
         if (child != n - 1 && a[child + 1] > a[child]) {
             child++;
         }
-        // 如果子節點比暫存的根節點大，就把子節點拉上來替代父節點
         if (temp < a[child]) {
             a[i] = a[child];
         }
         else {
-            break; // 父節點已經比子節點都大，符合 Max Heap 性質，停止下沉
+             break;
         }
     }
-    a[i] = temp; //將原本的根節點安置在最終點
+    a[i] = temp;
 }
 void HeapSort(int* a, int n) {
-    // 從最後一個非葉子節點開始，由底向上建立一個完整的 Max Heap
     for (int i = n / 2 - 1; i >= 0; i--) {
         MaxHeapify(a, i, n);
     }
-    // 每次將堆頂最大值交換到陣列最尾端固定，並縮小 Heap 規模重新調整
     for (int i = n - 1; i > 0; i--) {
-        swap(a[0], a[i]); // 把最大值換到陣列後方固定
-        MaxHeapify(a, 0, i); // 對前方剩餘的 i 個元素重新進行堆積下沉調整
+        swap(a[0], a[i]);
+        MaxHeapify(a, 0, i);
     }
 }
 void CompositeSort(int* a, int n) {
     if (n <= 32) {
-        InsertionSort(a, n); // 小資料量：直接利用插入排序
+        InsertionSort(a, n);
     }
     else {
-        MergeSort(a, n); // 大資料量：使用高穩定度的合併排序拆分
+        MergeSort(a, n);
     }
 }
 void GenerateInsertionWorst(int* a, int n) {
